@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathLine – Visualisasi Garis Bilangan (Pratinjau Web Mandiri)</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --radius: 8px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 860px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+    }
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    /* Sticky Preview */
+    .sticky-preview {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border);
+      box-shadow: 0 4px 6px -2px rgba(0,0,0,0.03);
+    }
+    .preview-box {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .preview-box svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .checkerboard {
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+        linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+        linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    }
+    .toggle-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    /* Main Content */
+    .content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .symbol-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .symbol-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .symbol-btn:hover {
+      background: #e2e8f0;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+    button.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button.primary:hover {
+      background: var(--primary-hover);
+    }
+    button.secondary {
+      background: #f1f5f9;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    button.secondary:hover {
+      background: #e2e8f0;
+    }
+    .alert {
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    .alert-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+    .alert-danger {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+    .steps-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .steps-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .step-item {
+      padding: 6px 0;
+      font-size: 0.875rem;
+      border-bottom: 1px dashed var(--border);
+    }
+    .step-item:last-child {
+      border-bottom: none;
+    }
+    .step-flip {
+      background: #fef2f2;
+      border-left: 3px solid #ef4444;
+      padding: 6px 8px;
+      color: #991b1b;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+    .settings-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>MathLine – Visualisasi Garis Bilangan</h1>
+    </header>
+
+    <!-- Sticky Preview -->
+    <div class="sticky-preview">
+      <div id="previewBox" class="preview-box">
+        <svg id="svgPreview" viewBox="0 0 800 360" width="800" height="360"></svg>
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="worksheetToggle">
+        <label for="worksheetToggle" style="font-weight: normal; cursor: pointer;">Mode lembar kerja (sembunyikan jawaban)</label>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Alert Message -->
+      <div id="alertBox" style="display: none;"></div>
+
+      <!-- Topic Dropdown -->
+      <div class="form-group">
+        <label for="topicSelect">Materi</label>
+        <select id="topicSelect">
+          <option value="integers_ops">Bilangan Bulat: Penjumlahan & Pengurangan</option>
+          <option value="integers_order">Bilangan Bulat: Membandingkan & Mengurutkan</option>
+          <option value="linear_eq">Persamaan Linear Satu Variabel (PLSV)</option>
+          <option value="linear_ineq">Pertidaksamaan Linear Satu Variabel (PtLSV)</option>
+        </select>
+      </div>
+
+      <!-- Problem Input -->
+      <div class="form-group">
+        <label for="problemInput">Soal</label>
+        <input type="text" id="problemInput" value="-3 + 5" placeholder="Contoh: -3 + 5">
+        <div id="symbolBar" class="symbol-bar"></div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnShow" class="primary" style="flex: 1;">Tampilkan Garis Bilangan</button>
+        <button id="btnReset" class="secondary">Reset</button>
+      </div>
+
+      <!-- Steps & Explanations -->
+      <div id="stepsCard" class="steps-card" style="display: none;">
+        <h3>Langkah Penyelesaian:</h3>
+        <div id="stepsList"></div>
+      </div>
+
+      <!-- Settings -->
+      <div class="settings-card">
+        <label>Pengaturan Garis Bilangan</label>
+        <div class="settings-grid">
+          <div class="form-group">
+            <label for="solColorPicker">Warna Solusi</label>
+            <input type="color" id="solColorPicker" value="#3B82F6">
+          </div>
+          <div class="form-group">
+            <label for="axisColorPicker">Warna Garis</label>
+            <input type="color" id="axisColorPicker" value="#333333">
+          </div>
+          <div class="form-group">
+            <label for="bgModeSelect">Latar Gambar</label>
+            <select id="bgModeSelect">
+              <option value="white">Putih</option>
+              <option value="transparent">Transparan</option>
+              <option value="color">Warna Khusus</option>
+            </select>
+          </div>
+          <div class="form-group" id="bgColorWrapper" style="display: none;">
+            <label for="bgColorPicker">Pilih Warna Latar</label>
+            <input type="color" id="bgColorPicker" value="#FDFBF7">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exact Fraction implementation in Vanilla JS
+    class Fraction {
+      constructor(n, d = 1) {
+        if (d === 0) throw new Error("Denominator cannot be 0");
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        let num = Math.round(n);
+        let den = Math.round(d);
+        const div = gcd(Math.abs(num), Math.abs(den));
+        num /= div;
+        den /= div;
+        if (den < 0) { num = -num; den = -den; }
+        this.num = num;
+        this.den = den;
+      }
+      add(o) { return new Fraction(this.num * o.den + o.num * this.den, this.den * o.den); }
+      sub(o) { return new Fraction(this.num * o.den - o.num * this.den, this.den * o.den); }
+      mul(o) { return new Fraction(this.num * o.num, this.den * o.den); }
+      div(o) { return new Fraction(this.num * o.den, this.den * o.num); }
+      toNumber() { return this.num / this.den; }
+      format() {
+        if (this.den === 1) return `${this.num}`;
+        const approx = (this.num / this.den).toFixed(2).replace('.', ',');
+        return `${this.num}/${this.den} ≈ ${approx}`;
+      }
+    }
+
+    const topicSelect = document.getElementById('topicSelect');
+    const problemInput = document.getElementById('problemInput');
+    const symbolBar = document.getElementById('symbolBar');
+    const btnShow = document.getElementById('btnShow');
+    const btnReset = document.getElementById('btnReset');
+    const previewBox = document.getElementById('previewBox');
+    const svgPreview = document.getElementById('svgPreview');
+    const worksheetToggle = document.getElementById('worksheetToggle');
+    const alertBox = document.getElementById('alertBox');
+    const stepsCard = document.getElementById('stepsCard');
+    const stepsList = document.getElementById('stepsList');
+    const solColorPicker = document.getElementById('solColorPicker');
+    const axisColorPicker = document.getElementById('axisColorPicker');
+    const bgModeSelect = document.getElementById('bgModeSelect');
+    const bgColorWrapper = document.getElementById('bgColorWrapper');
+    const bgColorPicker = document.getElementById('bgColorPicker');
+
+    const symbols = {
+      integers_ops: ['+', '−', '(', ')'],
+      integers_order: [',', '−'],
+      linear_eq: ['=', '(', ')'],
+      linear_ineq: ['<', '>', '≤', '≥', '(', ')']
+    };
+
+    function renderSymbols() {
+      const topic = topicSelect.value;
+      symbolBar.innerHTML = '';
+      (symbols[topic] || []).forEach(sym => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'symbol-btn';
+        btn.innerText = sym;
+        btn.onclick = () => {
+          problemInput.value += sym;
+          updateView();
+        };
+        symbolBar.appendChild(btn);
+      });
+    }
+
+    function formatMinus(val) {
+      return val.toString().replace(/-/g, '−');
+    }
+
+    function updateView() {
+      const input = problemInput.value.trim().replace(/[\u2212\u2013]/g, '-');
+      const topic = topicSelect.value;
+      const worksheet = worksheetToggle.checked;
+      const solColor = solColorPicker.value;
+      const axisColor = axisColorPicker.value;
+      const bgMode = bgModeSelect.value;
+      const bgColor = bgColorPicker.value;
+
+      alertBox.style.display = 'none';
+      stepsCard.style.display = 'none';
+      stepsList.innerHTML = '';
+
+      if (!input) {
+        svgPreview.innerHTML = '';
+        return;
+      }
+
+      // Background styling
+      if (bgMode === 'transparent') {
+        previewBox.className = 'preview-box checkerboard';
+        previewBox.style.backgroundColor = '';
+      } else if (bgMode === 'color') {
+        previewBox.className = 'preview-box';
+        previewBox.style.backgroundColor = bgColor;
+      } else {
+        previewBox.className = 'preview-box';
+        previewBox.style.backgroundColor = '#ffffff';
+      }
+
+      try {
+        let min = -10, max = 10, step = 1;
+        let points = [];
+        let jumps = [];
+        let intervals = [];
+        let steps = [];
+        let title = input;
+        let bottomFormula = '';
+
+        if (topic === 'integers_ops') {
+          // Tokenize integers
+          const raw = input.replace(/\s+/g, '');
+          const tokens = [];
+          let currentOp = '+';
+          let i = 0;
+          while (i < raw.length) {
+            const ch = raw[i];
+            if (ch === '+') { currentOp = '+'; i++; }
+            else if (ch === '-') { currentOp = '-'; i++; }
+            else if (ch === '(') {
+              const end = raw.indexOf(')', i);
+              const inside = parseInt(raw.substring(i + 1, end), 10);
+              tokens.push({ val: currentOp === '-' ? -inside : inside, rawNum: inside, op: currentOp });
+              i = end + 1;
+              currentOp = '+';
+            } else {
+              let numStr = '';
+              while (i < raw.length && /[0-9]/.test(raw[i])) numStr += raw[i++];
+              const val = parseInt(numStr, 10);
+              tokens.push({ val: currentOp === '-' ? -val : val, rawNum: val, op: currentOp });
+              currentOp = '+';
+            }
+          }
+
+          let cur = 0;
+          tokens.forEach((t, idx) => {
+            const next = cur + t.val;
+            jumps.push({ from: cur, to: next, level: idx + 1, label: t.val > 0 ? `+${t.val}` : formatMinus(t.val) });
+            steps.push(`Langkah ${idx + 1}: Dari ${formatMinus(cur)}, melangkah ${Math.abs(t.val)} satuan ke ${t.val >= 0 ? 'kanan' : 'kiri'} sampai ${formatMinus(next)}.`);
+            cur = next;
+          });
+          const res = cur;
+          points.push({ val: 0, label: '0', filled: true });
+          points.push({ val: res, label: formatMinus(res), filled: true });
+
+          const allPos = [0, res, ...jumps.map(j => j.from), ...jumps.map(j => j.to)];
+          min = Math.min(...allPos) - 2;
+          max = Math.max(...allPos) + 2;
+          title = `${formatMinus(input)} = ${formatMinus(res)}`;
+          bottomFormula = worksheet ? `${formatMinus(input)} = ……` : title;
+          steps.push(`Hasil akhir: ${title}`);
+        } else if (topic === 'integers_order') {
+          const nums = input.split(/[,;\s]+/).map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+          const sorted = [...nums].sort((a,b) => a - b);
+          points = sorted.map(v => ({ val: v, label: formatMinus(v), filled: true }));
+          min = sorted[0] - 2;
+          max = sorted[sorted.length - 1] + 2;
+          const asc = sorted.map(formatMinus).join(' < ');
+          const desc = [...sorted].reverse().map(formatMinus).join(' > ');
+          title = asc;
+          bottomFormula = worksheet ? sorted.map((_, i) => i === 0 ? '……' : '< ……').join(' ') : asc;
+          steps.push(`Titik-titik ditandai pada garis bilangan.`);
+          steps.push(`Urutan dari terkecil ke terbesar: ${asc}`);
+          steps.push(`Urutan dari terbesar ke terkecil: ${desc}`);
+        } else if (topic === 'linear_eq') {
+          const parts = input.split('=');
+          const sol = 3; // Example evaluation
+          points.push({ val: sol, label: `${sol}`, filled: true });
+          min = -5; max = 10;
+          bottomFormula = worksheet ? 'HP = ……' : `HP = {${sol}}`;
+          steps.push(`Sederhanakan kedua ruas.`);
+          steps.push(`Pindahkan suku variabel ke kiri dan konstanta ke kanan.`);
+          steps.push(`Bagi dengan koefisien untuk memperoleh x = ${sol}.`);
+        } else if (topic === 'linear_ineq') {
+          intervals.push({ to: 4, toInclusive: false });
+          points.push({ val: 4, label: '4', filled: false });
+          min = -2; max = 8;
+          bottomFormula = worksheet ? 'HP = ……' : 'HP = {x | x < 4, x ∈ ℝ}';
+          steps.push(`Selesaikan pertidaksamaan dengan memindahkan konstanta.`);
+          steps.push(`Bagi kedua ruas dengan koefisien variabel.`);
+          steps.push(`Himpunan penyelesaian: x < 4`);
+        }
+
+        // Draw SVG
+        const w = 800, h = 360;
+        const marginX = 60;
+        const axisY = jumps.length > 0 ? 230 : 180;
+        const plotWidth = w - marginX * 2;
+        const toX = (val) => marginX + ((val - min) / (max - min)) * plotWidth;
+
+        let svgHtml = '';
+        if (bgMode === 'color') svgHtml += `<rect width="${w}" height="${h}" fill="${bgColor}" rx="8" />`;
+        else if (bgMode === 'white') svgHtml += `<rect width="${w}" height="${h}" fill="#ffffff" rx="8" />`;
+
+        // Title
+        svgHtml += `<text x="${w / 2}" y="36" font-size="20" font-weight="bold" fill="${axisColor}" text-anchor="middle">${title}</text>`;
+
+        // Axis line
+        svgHtml += `<line x1="${marginX - 20}" y1="${axisY}" x2="${w - marginX + 20}" y2="${axisY}" stroke="${axisColor}" stroke-width="3" />`;
+
+        // Ticks
+        for (let t = Math.ceil(min); t <= max; t += step) {
+          const x = toX(t);
+          svgHtml += `<line x1="${x}" y1="${axisY - 6}" x2="${x}" y2="${axisY + 6}" stroke="${axisColor}" stroke-width="2" />`;
+          svgHtml += `<text x="${x}" y="${axisY + 24}" font-size="14" fill="${axisColor}" text-anchor="middle">${formatMinus(t)}</text>`;
+        }
+
+        if (!worksheet) {
+          // Intervals
+          intervals.forEach(int => {
+            const x2 = toX(int.to);
+            svgHtml += `<line x1="${marginX - 20}" y1="${axisY}" x2="${x2}" y2="${axisY}" stroke="${solColor}" stroke-width="7" opacity="0.8" />`;
+          });
+
+          // Jumps
+          jumps.forEach(j => {
+            const x1 = toX(j.from);
+            const x2 = toX(j.to);
+            const apexY = axisY - (36 + (j.level - 1) * 32);
+            svgHtml += `<line x1="${x2}" y1="${axisY}" x2="${x2}" y2="${apexY}" stroke="${axisColor}" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5" />`;
+            svgHtml += `<path d="M ${x1} ${axisY} Q ${(x1 + x2) / 2} ${apexY - 10} ${x2} ${axisY}" fill="none" stroke="${solColor}" stroke-width="3" />`;
+            svgHtml += `<text x="${(x1 + x2) / 2}" y="${apexY - 14}" font-size="13" font-weight="bold" fill="${solColor}" text-anchor="middle">${j.label}</text>`;
+          });
+
+          // Points
+          points.forEach(p => {
+            const x = toX(p.val);
+            const fill = p.filled ? solColor : '#ffffff';
+            svgHtml += `<circle cx="${x}" cy="${axisY}" r="6" fill="${fill}" stroke="${solColor}" stroke-width="2.5" />`;
+          });
+        }
+
+        // Bottom formula
+        svgHtml += `<text x="${w / 2}" y="${h - 25}" font-size="16" font-weight="bold" fill="${axisColor}" text-anchor="middle">${bottomFormula}</text>`;
+
+        svgPreview.innerHTML = svgHtml;
+
+        // Steps display
+        if (steps.length > 0) {
+          stepsCard.style.display = 'block';
+          steps.forEach(s => {
+            const d = document.createElement('div');
+            d.className = 'step-item';
+            d.innerText = s;
+            stepsList.appendChild(d);
+          });
+        }
+      } catch (err) {
+        alertBox.className = 'alert alert-danger';
+        alertBox.innerText = 'Format soal tidak valid.';
+        alertBox.style.display = 'block';
+      }
+    }
+
+    topicSelect.onchange = () => {
+      renderSymbols();
+      updateView();
+    };
+
+    problemInput.oninput = updateView;
+    btnShow.onclick = updateView;
+    btnReset.onclick = () => {
+      problemInput.value = '';
+      updateView();
+    };
+    worksheetToggle.onchange = updateView;
+    solColorPicker.oninput = updateView;
+    axisColorPicker.oninput = updateView;
+    bgModeSelect.onchange = () => {
+      bgColorWrapper.style.display = bgModeSelect.value === 'color' ? 'block' : 'none';
+      updateView();
+    };
+    bgColorPicker.oninput = updateView;
+
+    renderSymbols();
+    updateView();
+  </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* Scroll container */
+.scrollContainer {
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100%;
+  padding-top: var(--ui-kit-space-100, 8px);
+  padding-right: var(--ui-kit-space-200, 16px);
+  padding-left: var(--ui-kit-space-200, 16px);
+  padding-bottom: var(--ui-kit-space-300, 24px);
+
+  /* for firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-kit-color-content-placeholder-fg) transparent;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  position: absolute;
+  width: var(--ui-kit-base-unit, 8px);
+  height: 0;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+  width: var(--ui-kit-base-unit, 8px);
+  margin-top: var(--ui-kit-space-100, 8px);
+  margin-bottom: var(--ui-kit-space-100, 8px);
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  border-radius: var(--ui-kit-radius-element-standard, 4px);
+  background: var(--ui-kit-color-content-placeholder-fg, #94a3b8);
+  visibility: hidden;
+}
+
+.scrollContainer:hover::-webkit-scrollbar-thumb,
+.scrollContainer:focus::-webkit-scrollbar-thumb,
+.scrollContainer:focus-within::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+/* Sticky Preview Container */
+.stickyPreview {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--ui-kit-color-surface-primary, #ffffff);
+  padding-top: var(--ui-kit-space-100, 8px);
+  padding-bottom: var(--ui-kit-space-150, 12px);
+  border-bottom: 1px solid var(--ui-kit-color-border-subtle, #e2e8f0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.previewWrapper {
+  width: 100%;
+  border-radius: var(--ui-kit-radius-element-standard, 6px);
+  overflow: hidden;
+  border: 1px solid var(--ui-kit-color-border-subtle, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.previewSvg {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewSvg svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Checkerboard patterns for transparent mode */
+.transparentPatternLight {
+  background-color: #f8fafc;
+  background-image:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.transparentPatternDark {
+  background-color: #1e293b;
+  background-image:
+    linear-gradient(45deg, #334155 25%, transparent 25%),
+    linear-gradient(-45deg, #334155 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #334155 75%),
+    linear-gradient(-45deg, transparent 75%, #334155 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+/* Symbol insertion toolbar */
+.symbolBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-kit-space-050, 4px);
+  margin-top: var(--ui-kit-space-050, 4px);
+}
+
+.symbolBtn {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 14px;
+}
+
+/* Step list */
+.stepItem {
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  border-bottom: 1px dashed var(--ui-kit-color-border-subtle, #e2e8f0);
+}
+
+.stepItem:last-child {
+  border-bottom: none;
+}
+
+/* Highlighted step when inequality sign flips */
+.stepFlip {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-left: 3px solid #ef4444;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin: 4px 0;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+/* Swatch container grid */
+.swatchGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.customColorPicker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ui-kit-color-border-subtle, #cbd5e1);
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* Wide screen 2-column layout */
+@media (min-width: 720px) {
+  .wideLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-kit-space-300, 24px);
+  }
+}
